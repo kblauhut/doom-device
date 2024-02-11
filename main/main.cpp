@@ -16,15 +16,10 @@ extern "C" void app_main(void)
     controller_input input;
     Player *player = new Player();   
 
+    TickType_t last_rail_time = xTaskGetTickCount();
     TickType_t ticks = xTaskGetTickCount();
     std::vector<Rail> rails;
-
-    rails.push_back(create_rail_from_player_pos(
-        player,
-        0
-    ));
-
-  
+    
     while (1)
     {
         TickType_t new_ticks = xTaskGetTickCount();
@@ -34,6 +29,14 @@ extern "C" void app_main(void)
         player->update_player(&input, delta_ticks);
         renderFrame(*player, new_ticks, rails);
         draw_render_buffer_to_display();
+
+        // if (xTaskGetTickCount() - last_rail_time > 1000) {
+        //     last_rail_time = xTaskGetTickCount();
+        //     rails.push_back(create_rail_from_player_pos(
+        //         player,
+        //         ticks
+        //     ));
+        // }
     }
 
     uninstall_display();
