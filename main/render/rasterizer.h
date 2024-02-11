@@ -16,5 +16,12 @@ void rasterizeParallelogramInBounds(
         unsigned int color,
         bool enableShading
 );
+void rasterizeRect(
+        float x,
+        float y,
+        float width,
+        float height,
+        uint16_t color
+);
 
 #endif 

@@ -79,3 +79,25 @@ void rasterizeParallelogramInBounds(
         }
     }
 }
+
+void rasterizeRect(
+        float x,
+        float y,
+        float width,
+        float height,
+        uint16_t color
+) {
+    int startX = static_cast<int>(std::round(x));
+    int endX = static_cast<int>(std::round(x + width));
+
+    int startY = static_cast<int>(std::round(y));
+    int endY = static_cast<int>(std::round(y + height));
+
+    for (int x = startX; x < endX; x++) {
+        for (int y = startY; y < endY; y++) {
+            int pixelIndex = x + y * SCREEN_WIDTH;
+
+            RENDER_BUFFER[pixelIndex] = color;
+        }
+    }
+}

@@ -67,5 +67,5 @@ void renderFrame(Player &player, double delta) {
     }
 
 
-    // draw_render_buffer_to_display();
+    draw_crosshair();
 }
