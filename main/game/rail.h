@@ -33,4 +33,9 @@ public:
     std::vector<float> destination;
 };
 
+Rail create_rail_from_player_pos(
+        Player* player,
+        int tick_count
+);
+
 #endif // RAIL_H

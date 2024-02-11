@@ -30,12 +30,10 @@ void Rail::render(
 
     std::vector<float> player_position = std::vector<float>{player->position->at(0), player->position->at(1)};
     float player_z = player->position->at(2);
-
-    float determinant = -1.0;
-    // const determinant = det([
-    //   subtract(this->origin, this->destination),
-    //   subtract(player->position, this->destination),
-    // ]);
+    
+    std::vector<float> sub1 = subtract(this->origin, this->destination);
+    std::vector<float> sub2 = subtract(player_position, this->destination);
+    float determinant = sub1[0] * sub2[1] - sub1[1] * sub2[0];
 
     std::pair<std::vector<float>, std::vector<float>> clipped_points = clipLineSegmentWithFrustum(
       player->position,
@@ -46,11 +44,11 @@ void Rail::render(
       VIEW_DISTANCE
     );
 
-        if (clipped_points.first[0] == 0.0 && clipped_points.first[1] == 0.0 && 
-                clipped_points.second[0] == 0.0 && clipped_points.second[1] == 0.0
-        ) {
-            return;
-        }
+    if (clipped_points.first[0] == 0.0 && clipped_points.first[1] == 0.0 && 
+      clipped_points.second[0] == 0.0 && clipped_points.second[1] == 0.0
+    ) {
+      return;
+    }
 
     std::vector<float> origin_clipped = clipped_points.first;
     std::vector<float> destination_clipped = clipped_points.second;
@@ -115,4 +113,79 @@ void Rail::render(
       distance(player_position, origin_clipped),
       distance(player_position, destination_clipped)
     );
+}
+
+static std::vector<float> intersect_with_map(
+  const Sector* sector,
+  std::vector<float> origin,
+  float yaw
+) {
+  int intersecting_wall_index = -1;
+  std::vector<float> intersect = {};
+  for (int index = 1; index < sector->vertices.size(); index++) {
+    std::vector<float> vertex_a = sector->vertices[index - 1];
+    std::vector<float> vertex_b = sector->vertices[index];
+
+    intersect = getLineSegmentIntersection(
+      origin,
+      std::vector<float>{
+        origin[0] + std::cos(yaw) * 10000,
+        origin[1] + std::sin(yaw) * 10000
+      },
+      vertex_a,
+      vertex_b
+    );
+
+
+    if(!intersect.empty()){
+      intersecting_wall_index = index - 1;
+      break;
+    }
+  }
+
+  if (intersecting_wall_index == -1) return intersect;
+
+  int portal_walls_index = -1;
+  for (int i = 0; i < sector->portalWallsIndices.size(); i++) {
+    if (sector->portalWallsIndices[i] == intersecting_wall_index) {
+      portal_walls_index = i;
+      break;
+    }
+  }
+
+  if (portal_walls_index == -1) return intersect;
+
+  int neighbour_index = sector->neighbourIds[portal_walls_index];
+  const Sector* portal_sector = &MAP[0];
+  for (int i = 0; i < MAP.size(); i++) {
+    if (MAP[i].id == neighbour_index) {
+      portal_sector = &MAP[i];
+      break;
+    }
+  }
+
+  return intersect_with_map(portal_sector, intersect, yaw);
+}
+
+Rail create_rail_from_player_pos(
+  Player* player,
+  int tick_count
+) {
+  std::vector<float> origin = std::vector<float>{
+    player->position->at(0) + (std::cos(player->yaw) * 0.5f),
+    player->position->at(1) + (std::sin(player->yaw) * 0.5f)
+   };
+
+  std::vector<float> intersect = intersect_with_map(
+      player->current_sector,
+      origin,
+      player->yaw
+  );
+
+  return Rail(
+    tick_count,
+    player->position->at(2),
+    origin,
+    intersect
+  );
 }

@@ -22,6 +22,7 @@ public:
     float yaw = 0.0;
     float forward_velocity = 0.0;
     std::unique_ptr<std::vector<float>> position;
+    const Sector *current_sector;
 };
 
 #endif // PLAYER_H

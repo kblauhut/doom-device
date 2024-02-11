@@ -19,13 +19,12 @@ extern "C" void app_main(void)
     TickType_t ticks = xTaskGetTickCount();
     std::vector<Rail> rails;
 
-    rails.push_back(Rail(
-        0,
-        0.0,
-        std::vector<float>{0.0, -10.0, 0.0},
-        std::vector<float>{100.0, 0.0, 0.0}
+    rails.push_back(create_rail_from_player_pos(
+        player,
+        0
     ));
 
+  
     while (1)
     {
         TickType_t new_ticks = xTaskGetTickCount();

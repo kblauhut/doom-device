@@ -5,7 +5,8 @@ float acceleration = 0.001f;
 float deceleration = 0.002f;
 
 Player::Player() :
-        position(std::make_unique<std::vector<float>>(std::vector<float>{0.0f, 0.0f, 1.0f}))
+        position(std::make_unique<std::vector<float>>(std::vector<float>{0.0f, 0.0f, 1.0f})),
+        current_sector(&MAP[0])
         {}
 
 
