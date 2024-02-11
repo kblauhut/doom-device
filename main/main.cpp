@@ -1,57 +1,32 @@
-#include "io/display.h"
 #include "game/player.h"
 #include "render/frame_renderer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_log.h"
+#include "io/display.h"
+#include "io/controller.h"
 
 static char *TAG = "main";
 
 extern "C" void app_main(void)
 {
-   
-    Player *player = new Player();   
+    set_up_controller();
     init_display();
-    // int count = SCREEN_HEIGHT * SCREEN_WIDTH;
 
-    // // //PINK
-    // // for (size_t i = 0; i < count; i++)
-    // // {
-    // //         RENDER_BUFFER[i] = 0xA8F0;
-    // // }
-    // draw_render_buffer_to_display();
-    // vTaskDelay(1000 / portTICK_PERIOD_MS);
+    controller_input input;
+    Player *player = new Player();   
 
-    // // renderFrame(*player, 0);
-    // // draw_render_buffer_to_display();
-    // // vTaskDelay(10000 / portTICK_PERIOD_MS);
-    
-    // // // PURPLE
-    // // for (size_t i = 0; i < count; i++)
-    // // {
-    // //     RENDER_BUFFER[i] = 0xF0AA;
-    // // }
-    // player->position->at(0) = 2.0;
-    // renderFrame(*player, 0);
-    // draw_render_buffer_to_display();
-    // vTaskDelay(1000 / portTICK_PERIOD_MS);
-
-
-    TickType_t ticks0 =  xTaskGetTickCount();
-    for (size_t i = 0; i < 100; i++)
+    TickType_t ticks = xTaskGetTickCount();
+    while (1)
     {
-        player->position->at(0) = i * 0.1;
+        TickType_t new_ticks = xTaskGetTickCount();
+        int delta_ticks = new_ticks - ticks;
+        ticks = new_ticks;
+        read_controller_input(&input);
+        player->update_player(&input, delta_ticks);
         renderFrame(*player, 0);
         draw_render_buffer_to_display();
     }
-    
-
-    TickType_t ticks1 =  xTaskGetTickCount();
-    TickType_t ticks = ticks1 - ticks0;
 
     uninstall_display();
-
-    ESP_LOGI(TAG, "Ticks: %ld %ld", ticks, ticks / portTICK_PERIOD_MS);
-    ESP_LOGI(TAG, "Ticks: %ld %ld", ticks0 ,ticks1);
-    ESP_LOGI(TAG, "END");
 }

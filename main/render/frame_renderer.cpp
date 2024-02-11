@@ -7,18 +7,16 @@ void renderFrame(Player &player, double delta) {
     
     // Build the view frustum
     float frustumLeft[2] = {
-            std::cos((*player.rotation)[1] - FOV_RAD / 2),
-            std::sin((*player.rotation)[1] - FOV_RAD / 2)
+            std::cos(player.yaw - FOV_RAD / 2),
+            std::sin(player.yaw - FOV_RAD / 2)
     };
 
     float frustumRight[2] = {
-            std::cos((*player.rotation)[1] + FOV_RAD / 2),
-            std::sin((*player.rotation)[1] + FOV_RAD / 2)
+            std::cos(player.yaw + FOV_RAD / 2),
+            std::sin(player.yaw + FOV_RAD / 2)
     };
 
     std::vector<float> playerPosition = {(*player.position)[0], (*player.position)[1]};
-
-    // printf("Player position: %f, %f\n", playerPosition[0], playerPosition[1]);
     
     // Find the sector the player is in
     Sector initialSector;
@@ -28,7 +26,6 @@ void renderFrame(Player &player, double delta) {
             break;
         }
     }
-    // printf("Initial sector: %d\n", initialSector.id);
 
 
     const auto initialTopRenderBound = std::vector<std::vector<float>>{{{0, 0}, {float(SCREEN_WIDTH), 0}}};
