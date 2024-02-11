@@ -57,6 +57,21 @@ void renderPortal(Player& player, Portal& portal, std::vector<Portal>& portalQue
             }
         }
 
+        if (portalIndex == -1) {
+                int pointCount = rX - lX;
+                int leftDist = distance(*player.position, leftWallPoint);
+                int rightDist = distance(*player.position, rightWallPoint);
+                for (int i = 0; i < pointCount; i++) {
+                        // https://www.scratchapixel.com/lessons/3d-basic-rendering/rasterization-practical-implementation/visibility-problem-depth-buffer-depth-interpolation.html
+                        float lambda = i / pointCount;
+                        float z = (1 / leftDist) * (1 - lambda) + (1 / rightDist) * lambda;
+                        float z_inverse = 1 / z;
+
+                int buffer_index = std::round(lX) + i;
+                DEPTH_BUFFER[buffer_index] = z_inverse;
+                }
+        }
+
         if (portalIndex != -1) {
             auto& nextSector = *std::find_if(MAP.begin(), MAP.end(), [&](const auto& sec) { return sec.id == sector.neighbourIds[portalIndex]; });
 

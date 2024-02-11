@@ -1,4 +1,5 @@
 #include "rasterizer.h"
+#include "render_config.h"
 
 // Convert RGB values to a single integer color value
 uint16_t rgbColor(int r, int g, int b) {
@@ -83,8 +84,7 @@ void rasterizeParallelogramDepthClip(
         const std::vector<std::vector<float>>& parallelogramBottomLine,
         uint16_t color,
         float start_distance,
-        float end_distance,
-        float* depth_buffer
+        float end_distance
 ) {
     int minPolygonX = static_cast<int>(std::round(parallelogramTopLine[0][0]));
     int maxPolygonX = static_cast<int>(std::round(parallelogramTopLine[1][0]));
@@ -120,7 +120,7 @@ void rasterizeParallelogramDepthClip(
         float z = (1 / start_distance) * (1 - lambda) + (1 / end_distance) * lambda;
         float z_inverse = 1 / z;
 
-        if (depth_buffer[x] < z_inverse) {
+        if (DEPTH_BUFFER[x] < z_inverse) {
                 continue;
         }
 

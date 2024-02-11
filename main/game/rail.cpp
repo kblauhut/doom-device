@@ -1,6 +1,6 @@
 #include "rail.h"
 
-int LIFETIME_TICKS = 1000;
+float LIFETIME_TICKS = 1000.0;
 float SCREEN_ASPECT_RATIO = SCREEN_WIDTH / SCREEN_HEIGHT;
 float SCREEN_VERTICAL_FOV = FOV_RAD / SCREEN_ASPECT_RATIO;
 
@@ -21,18 +21,17 @@ void Rail::render(
     int tick_count,
     Player* player,
     std::vector<float> frustum_left,
-    std::vector<float> frustum_right,
-    float* depth_buffer
+    std::vector<float> frustum_right
 ) {
     int delta_ticks = tick_count - this->creation_tick_count;
     if (delta_ticks > LIFETIME_TICKS) return;
 
-    float animation_value = 1 - delta_ticks / LIFETIME_TICKS;
+    float animation_value = 1.0 - (delta_ticks / LIFETIME_TICKS);
 
     std::vector<float> player_position = std::vector<float>{player->position->at(0), player->position->at(1)};
     float player_z = player->position->at(2);
 
-    float determinant = 1.0;
+    float determinant = -1.0;
     // const determinant = det([
     //   subtract(this->origin, this->destination),
     //   subtract(player->position, this->destination),
@@ -47,7 +46,11 @@ void Rail::render(
       VIEW_DISTANCE
     );
 
-    if (clipped_points == std::make_pair(std::vector<float>{0.0, 0.0}, std::vector<float>{0.0, 0.0})) return;
+        if (clipped_points.first[0] == 0.0 && clipped_points.first[1] == 0.0 && 
+                clipped_points.second[0] == 0.0 && clipped_points.second[1] == 0.0
+        ) {
+            return;
+        }
 
     std::vector<float> origin_clipped = clipped_points.first;
     std::vector<float> destination_clipped = clipped_points.second;
@@ -78,7 +81,7 @@ void Rail::render(
     float l_bottom_Y = getScreenY(
      player_position,
       origin_clipped,
-      this->height - animation_value / 2 - player_z,
+       this->height - player_z - (10.0/animation_value),
       SCREEN_VERTICAL_FOV
     );
 
@@ -92,13 +95,13 @@ void Rail::render(
     float r_bottom_Y = getScreenY(
      player_position,
       destination_clipped,
-      this->height - animation_value / 2 - player_z,
+       this->height - player_z - (10.0/animation_value),
       SCREEN_VERTICAL_FOV
     );
 
 
-    uint16_t color = rgbColor(255 * animation_value, 255, 255 * animation_value);
-    
+    uint16_t color = rgbColor(255, 255 * animation_value, 255 * animation_value);
+
     rasterizeParallelogramDepthClip(
         std::vector<std::vector<float>>{
             {l_X, l_top_Y},
@@ -110,7 +113,6 @@ void Rail::render(
         },
       color,
       distance(player_position, origin_clipped),
-      distance(player_position, destination_clipped),
-      depth_buffer
+      distance(player_position, destination_clipped)
     );
 }

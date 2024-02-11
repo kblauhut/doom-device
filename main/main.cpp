@@ -17,6 +17,15 @@ extern "C" void app_main(void)
     Player *player = new Player();   
 
     TickType_t ticks = xTaskGetTickCount();
+    std::vector<Rail> rails;
+
+    rails.push_back(Rail(
+        0,
+        0.0,
+        std::vector<float>{0.0, -10.0, 0.0},
+        std::vector<float>{100.0, 0.0, 0.0}
+    ));
+
     while (1)
     {
         TickType_t new_ticks = xTaskGetTickCount();
@@ -24,7 +33,7 @@ extern "C" void app_main(void)
         ticks = new_ticks;
         read_controller_input(&input);
         player->update_player(&input, delta_ticks);
-        renderFrame(*player, 0);
+        renderFrame(*player, new_ticks, rails);
         draw_render_buffer_to_display();
     }
 

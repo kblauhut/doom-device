@@ -2,9 +2,11 @@
 #include <cmath>
 
 #include "frame_renderer.h"
+#include "render_config.h"
 
-void renderFrame(Player &player, double delta) {
-    
+extern float DEPTH_BUFFER[SCREEN_WIDTH] = {0.0};
+
+void renderFrame(Player &player, int tick_count, std::vector<Rail> rails) {  
     // Build the view frustum
     float frustumLeft[2] = {
             std::cos(player.yaw - FOV_RAD / 2),
@@ -66,6 +68,9 @@ void renderFrame(Player &player, double delta) {
         renderedPortals++;
     }
 
+    for (Rail &rail: rails) {
+        rail.render(tick_count, &player, nextFrustumLeft, nextFrustumRight);
+    }
 
     draw_crosshair();
 }

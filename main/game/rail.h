@@ -16,8 +16,7 @@ public:
         int tick_count,
         Player* player,
         std::vector<float> frustum_left,
-        std::vector<float> frustum_right,
-        float* depth_buffer
+        std::vector<float> frustum_right
     );
 
     // Constructor
